@@ -1,34 +1,38 @@
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 
+import { Link } from 'components/Link'
 import { ArrowRightIcon } from '@primer/octicons-react'
 import { useMainContext } from 'components/context/MainContext'
 
 import { useProductLandingContext } from 'components/context/ProductLandingContext'
 import { GuideCard } from 'components/landing/GuideCard'
+import { useTranslation } from 'components/hooks/useTranslation'
 
 export const GuideCards = () => {
   const router = useRouter()
   const { currentCategory } = useMainContext()
-  const { guideCards } = useProductLandingContext()
+  const { featuredLinks, hasGuidesPage } = useProductLandingContext()
+  const { t } = useTranslation('product_landing')
 
-  if (!guideCards) {
+  const routePath = `/${router.locale}${router.asPath.split('?')[0]}` // remove query string
+
+  if (!featuredLinks.guideCards) {
     return null
   }
 
   return (
     <div>
-      <div className="d-lg-flex gutter-lg flex-items-stretch">
-        {(guideCards || []).map((guide) => {
-          return <GuideCard key={guide.href} guide={guide} />
-        })}
+      <div className="d-lg-flex flex-items-stretch">
+        <ul className="d-flex flex-wrap gutter width-full">
+          {(featuredLinks.guideCards || []).map((guide) => {
+            return <GuideCard key={guide.href} guide={guide} />
+          })}
+        </ul>
       </div>
 
-      {!currentCategory && (
-        <Link href={`${router.asPath}/guides`}>
-          <a className="btn btn-outline float-right">
-            Explore guides <ArrowRightIcon />
-          </a>
+      {!currentCategory && hasGuidesPage && (
+        <Link href={`${routePath}/guides`} className="btn btn-outline float-right">
+          {t('explore_guides')} <ArrowRightIcon />
         </Link>
       )}
     </div>
